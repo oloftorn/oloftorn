@@ -4,18 +4,19 @@ function doGet(e) {
     return HtmlService.createHtmlOutput("request received");
   }
   
-  
-  //this is a function that fires when the webapp receives a POST request
-  function doPost(e) {
-     var sheet = SpreadsheetApp.getActiveSheet();
-    var lastRow = Math.max(sheet.getLastRow(),1);
-    var jsonData = getJsonFromTriggerbeePayload(e.postData);
-    BuildHeaders(sheet, lastRow, jsonData);
-    AddResponses(sheet, lastRow, jsonData);
-  
-    SpreadsheetApp.flush();
-    return HtmlService.createHtmlOutput("post request received");
-  }
+
+//this is a function that fires when the webapp receives a POST request
+function doPost(e) {
+   var sheet = SpreadsheetApp.getActiveSheet();
+  var lastRow = Math.max(sheet.getLastRow(),1);
+  var jsonData = getJsonFromTriggerbeePayload(e.postData);
+
+  BuildHeaderRows(jsonData, lastRow);
+  AddResponses(sheet, lastRow, jsonData);
+
+  SpreadsheetApp.flush();
+  return HtmlService.createHtmlOutput("post request received");
+}
   
   function getJsonFromTriggerbeePayload(postData)
   {
