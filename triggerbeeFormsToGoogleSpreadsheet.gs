@@ -63,23 +63,31 @@ function AddResponses(sheet, row, json)
   var fields = json.visit.Fields;
   for (let key in fields) {
       let val = fields[key];
-      sheet.getRange(row + 1, columnCounter++).setValue(val);
+      if(key.substring(0,3)!="pp_")
+      {
+        sheet.getRange(row + 1, columnCounter++).setValue(val);
+      }
   }
   sheet.getRange(row + 1, columnCounter++).setValue("https://app.triggerbee.com/insights/visits?sessionid="+json.visit.SessionId);
   
   var lastHeader = getLastHeader(row);
-  headerColumnCounter = 1;
-  for(let i = 1; i < lastHeader.getNumColumns(); i++)
-  {
-     var cell = lastHeader.getCell(1,i);
-     if(cell.getValue()!="")
-        headerColumnCounter++;
-  }
+  var headerColumnCounter = 1;
+  if(lastHeader){
+     logmsg("Header exists");
+    for(let i = 1; i < lastHeader.getNumColumns(); i++)
+    {
+      var cell = lastHeader.getCell(1,i);
+      if(cell.getValue()!="")
+          headerColumnCounter++;
+    }
+  }else
+    logmsg("Header does not exist");
+  
   ApplyRegularStyle(sheet.getRange(row + 1, 1, 1, 10));
 
-  logmsg("column: " + columnCounter + "; headerColumnCounter: " + headerColumnCounter + "");
+  logmsg("column: " + columnCounter + "; headerColumnCounter: " + headerColumnCounter + "; row: " + row);
     
-  if(columnCounter != headerColumnCounter)
+  if(columnCounter != headerColumnCounter || row == 1)
   { 
      sheet.insertRowsAfter(row, 1);
      logmsg("Different column count in header (" + columnCounter + "; headerColumnCounter: " + headerColumnCounter + "). Building new header!");
@@ -163,8 +171,9 @@ function BuildHeaderRows(json, row)
   var fields = json.visit.Fields;
   for (let key in fields) {
         let val = fields[key];
-        var cell = SpreadsheetApp.getActiveSheet().getRange(row, columnCounter++);
-        cell.setValue(key);
+        if(key.substring(0, 3)!="pp_"){
+          SpreadsheetApp.getActiveSheet().getRange(row, columnCounter++).setValue(key);
+        }
   }
   sheet.getRange(row, columnCounter++).setValue("Session");
 }
